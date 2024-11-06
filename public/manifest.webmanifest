@@ -1,6 +1,6 @@
 {
-  "name": "calculator",
-  "short_name": "calculator",
+  "name": "计算器",
+  "short_name": "计算器",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
