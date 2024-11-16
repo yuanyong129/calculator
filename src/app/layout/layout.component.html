@@ -11,7 +11,7 @@
             标准
           </mat-list-item>
           <div mat-subheader>转换器</div>
-          <mat-list-item mat-list-item (click)="goto('length')">
+          <mat-list-item [activated]="url() === '/length'" (click)="goto('/length')">
             长度
           </mat-list-item>
         </mat-nav-list>
