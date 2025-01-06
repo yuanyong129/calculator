@@ -1,64 +1,41 @@
+import { bignumber, add, divide, multiply, subtract, sqrt, pow, format } from "mathjs";
 export class FMath {
   /**
-   * @name 加法
+   * 加法
    */
-  static plus(a: number|string, b: number|string): number {
-    if(typeof a === 'string')
-      a = Number(a);
-    if(typeof b === 'string')
-      b = Number(b);
-    return a + b;
+  static plus(a: number|string, b: number|string): string {
+    return add(bignumber(a), bignumber(b)).toString();
   }
   /**
-   * @name 减法
+   * 减法
    */
-  static minus(a: number|string, b: number|string): number {
-    if(typeof a === 'string')
-      a = Number(a);
-    if(typeof b === 'string')
-      b = Number(b);
-    return a - b;
+  static minus(a: number|string, b: number|string): string {
+    return subtract(bignumber(a), bignumber(b)).toString();
   }
   /**
-   * @name 乘法
+   * 乘法
    */
-  static multiple(a: number|string, b: number|string): number {
-    if(typeof a === 'string')
-      a = Number(a);
-    if(typeof b === 'string')
-      b = Number(b);
-    return a * b;
+  static multiple(a: number|string, b: number|string): string {
+    return multiply(bignumber(a), bignumber(b)).toString();
   }
-  /** @name 除法 */
-  static divide(a: number|string, b: number|string): number {
-    if(typeof a === 'string')
-      a = Number(a);
-    if(typeof b === 'string')
-      b = Number(b);
-    return a / b;
+  /** 除法 */
+  static divide(a: number|string, b: number|string): string {
+    return format(divide(bignumber(a), bignumber(b)), { lowerExp: -12, upperExp: 12 });
   }
-  /** @name 平方根 */
+  /** 平方根 */
   static squareRoot(a: number|string) {
-    if(typeof a === 'string')
-      a = Number(a);
-    return Math.sqrt(a);
+    return sqrt(bignumber(a));
   }
-  /** @name 平方 */
+  /** 平方 */
   static square(a: number|string) {
-    if(typeof a === 'string')
-      a = Number(a);
-    return Math.pow(a, 2);
+    return pow(bignumber(a), 2);
   }
-  /** @name 倒数 */
+  /** 倒数 */
   static reciprocal(a: number|string) {
-    if(typeof a === 'string')
-      a = Number(a);
     return this.divide(1, a);
   }
-  /** @name 取反 */
+  /** 取反 */
   static negate(a: number|string ) {
-    if(typeof a === 'string')
-      a = Number(a);
     return this.minus(0, a);
   }
 }

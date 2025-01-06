@@ -3,6 +3,14 @@ import { Component, Input } from "@angular/core";
 @Component({
   selector: 'display-area',
   standalone: true,
+  template: `
+    <div class="display-expression">
+      {{ expression }}
+    </div>
+    <div class="display-result">
+      {{ result }}
+    </div>
+  `,
   styles: `
     .display-result {
       font-size: 56px;
@@ -14,7 +22,6 @@ import { Component, Input } from "@angular/core";
       margin-bottom: 8px;
     }
   `,
-  templateUrl: './display-area.component.html',
 })
 export class DisplayAreaComponent {
   @Input()

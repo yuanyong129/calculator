@@ -1,7 +1,9 @@
 import { Component } from "@angular/core";
 
 @Component({
-  templateUrl: './settings.component.html',
+  template: `
+    settings
+  `,
 })
 export class SettingsComponent {
 

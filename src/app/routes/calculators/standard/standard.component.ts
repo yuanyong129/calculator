@@ -6,7 +6,12 @@ import { MATH_SYMBOL } from "@/app/shared/constant";
 @Component({
   imports: [DisplayAreaComponent, KeyboardAreaComponent],
   standalone: true,
-  templateUrl: './standard.component.html',
+  template: `
+    <div class="standard-container">
+      <display-area [result]="result" [expression]="expression"></display-area>
+      <keyboard-area (keyPress)="onKeyPress($event)"></keyboard-area>
+    </div>
+  `,
   styles: `
     .standard-container {
       display: flex;
@@ -40,11 +45,12 @@ import { MATH_SYMBOL } from "@/app/shared/constant";
 export class StandardComponent {
   result: string = "0";
   expression: string = "";
+  isFinished: boolean = false;
 
   calc() {
     this.expression += this.result;
     this.result = this.calcExpression(this.expression);
-    // isFinished = true;
+    this.isFinished = true;
   }
 
   calcExpression(expression: string) {
@@ -94,19 +100,19 @@ export class StandardComponent {
         break;
       case MATH_SYMBOL.PLUS: // 加法
         this.expression = this.result + '+';
-        this.result = '';
+        this.result = '0';
         break;
       case MATH_SYMBOL.MINUS: // 减法
         this.expression = this.result + '-';
-        this.result = '';
+        this.result = '0';
         break;
       case MATH_SYMBOL.MULTIPLE: // 乘法
         this.expression = this.result + '×';
-        this.result = '';
+        this.result = '0';
         break;
       case MATH_SYMBOL.DIVIDE: // 除法
         this.expression = this.result + '÷';
-        this.result = '';
+        this.result = '0';
         break;
       case '0':
         this.result += '0';
@@ -122,8 +128,13 @@ export class StandardComponent {
         this.result = FMath.negate(this.result).toString();
         break;
       default:
-        if(this.result !== '0') this.result += val;
-        else this.result = val;
+        if(this.isFinished) {
+          this.result = val;
+          this.isFinished = false;
+        } else {
+          if(this.result !== '0') this.result += val;
+          else this.result = val;
+        }
         break;
     }
   }

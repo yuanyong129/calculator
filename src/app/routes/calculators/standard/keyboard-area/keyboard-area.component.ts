@@ -14,13 +14,27 @@ interface IKeyItem {
   imports: [MatButtonModule, MatIconModule],
   selector: 'keyboard-area',
   standalone: true,
-  templateUrl: './keyboard-area.component.html',
+  template: `
+    @for(item of keyItems; track $index) {
+      @if(item.isIcon) {
+        <button class="key-button" mat-raised-button (click)="btnClick(item.value)">
+          <mat-icon style="width: 30px; height: 30px; font-size: 30px;">{{ item.iconName }}</mat-icon>
+        </button>
+      } @else {
+        <button class="key-button text" mat-raised-button (click)="btnClick(item.value)">
+          <span> {{ item.label }}</span>
+        </button>
+      }
+    }
+  `,
   styles: `
-    .keyboard-area {
-      flex: 1;
-      display: grid;
-      grid-template-rows: repeat(6, 1fr);
-      grid-template-columns: 1fr 1fr 1fr 1fr;
+    .key-button {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      &.text {
+        font-size: 28px;
+      }
     }
   `
 })
@@ -31,7 +45,7 @@ export class KeyboardAreaComponent {
     { value: MATH_SYMBOL.PERCENT, isIcon: true, iconName: 'percent-outline' },
     { label: 'CE', value: MATH_SYMBOL.CLEAR_ERROR, isIcon: false },
     { label: 'C', value: MATH_SYMBOL.CLEAR, isIcon: false },
-    { value: MATH_SYMBOL.PERCENT, isIcon: true, iconName: 'backspace-outline' },
+    { value: MATH_SYMBOL.BACK, isIcon: true, iconName: 'backspace-outline' },
 
     { value: MATH_SYMBOL.RECIPROCAL, label: MATH_SYMBOL.RECIPROCAL, isIcon: false },
     { value: MATH_SYMBOL.SQUARE, label: MATH_SYMBOL.SQUARE, isIcon: false },

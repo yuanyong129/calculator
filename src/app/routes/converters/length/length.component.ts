@@ -1,7 +1,9 @@
 import { Component } from "@angular/core";
 
 @Component({
-  templateUrl: './length.component.html',
+  template: `
+    length
+  `,
 })
 export class LengthComponent {
 
