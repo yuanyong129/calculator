@@ -43,98 +43,142 @@ import { MATH_SYMBOL } from "@/app/shared/constant";
   `
 })
 export class StandardComponent {
-  result: string = "0";
-  expression: string = "";
+  result: string = '0';
+  expression: string = '';
   isFinished: boolean = false;
+  private readonly operatorPattern = /[+\-×÷]$/;
 
   calc() {
-    this.expression += this.result;
-    this.result = this.calcExpression(this.expression);
+    if (this.result === 'Error') {
+      return;
+    }
+
+    if (!this.expression) {
+      return;
+    }
+
+    const expression = this.operatorPattern.test(this.expression)
+      ? `${this.expression}${this.result}`
+      : this.expression;
+
+    this.result = this.calcExpression(expression);
+    this.expression = '';
     this.isFinished = true;
   }
 
   calcExpression(expression: string) {
-    let result = '';
-    if(expression.includes(MATH_SYMBOL.PLUS)) {
-      const [a, b] = expression.split(MATH_SYMBOL.PLUS);
-      result = FMath.plus(a, b).toString();
+    return FMath.evaluate(expression);
+  }
+
+  private resetAfterError() {
+    this.result = '0';
+    this.expression = '';
+    this.isFinished = false;
+  }
+
+  private appendOperator(operator: string) {
+    if (this.result === 'Error') {
+      this.resetAfterError();
     }
-    if(expression.includes(MATH_SYMBOL.MINUS)) {
-      const [a, b] = expression.split(MATH_SYMBOL.MINUS);
-      result = FMath.minus(a, b).toString();
+
+    if (!this.expression) {
+      this.expression = `${this.result}${operator}`;
+      this.result = '0';
+      this.isFinished = false;
+      return;
     }
-    if(expression.includes(MATH_SYMBOL.MULTIPLE)) {
-      const [a, b] = expression.split(MATH_SYMBOL.MULTIPLE);
-      result = FMath.multiple(a, b).toString();
+
+    if (this.operatorPattern.test(this.expression)) {
+      this.expression = this.expression.slice(0, -1) + operator;
+      return;
     }
-    if(expression.includes(MATH_SYMBOL.DIVIDE)) {
-      const [a, b] = expression.split(MATH_SYMBOL.DIVIDE);
-      result = FMath.divide(a, b).toString();
-    }
-    return result;
+
+    const computed = this.calcExpression(`${this.expression}${this.result}`);
+    this.expression = `${computed}${operator}`;
+    this.result = '0';
+    this.isFinished = false;
   }
 
   onKeyPress(val: string) {
+    if (this.result === 'Error' && val !== MATH_SYMBOL.CLEAR && val !== MATH_SYMBOL.CLEAR_ERROR) {
+      this.resetAfterError();
+    }
+
     switch (val) {
       case MATH_SYMBOL.PERCENT:
-        this.result = FMath.divide(this.result, 100).toString();
+        this.result = FMath.divide(this.result, 100);
+        this.isFinished = true;
         break;
       case MATH_SYMBOL.CLEAR:
-        this.expression = '';
+        this.resetAfterError();
+        break;
+      case MATH_SYMBOL.CLEAR_ERROR:
         this.result = '0';
+        this.isFinished = false;
         break;
-      case MATH_SYMBOL.CLEAR_ERROR: //清空
-        this.result = '0';
+      case MATH_SYMBOL.BACK:
+        if (this.isFinished || this.result === 'Error') {
+          this.result = '0';
+        } else if (this.result.length <= 1 || this.result === '-0') {
+          this.result = '0';
+        } else {
+          this.result = this.result.slice(0, -1);
+        }
         break;
-      case MATH_SYMBOL.BACK: // 消除
-        this.result = this.result.length > 0 ? this.result.substring(0, this.result.length - 1) : ''
+      case MATH_SYMBOL.RECIPROCAL:
+        this.result = FMath.reciprocal(this.result);
+        this.isFinished = true;
         break;
-      case MATH_SYMBOL.RECIPROCAL: // 倒数
-        this.result = FMath.reciprocal(this.result).toString();
+      case MATH_SYMBOL.SQUARE:
+        this.result = FMath.square(this.result);
+        this.isFinished = true;
         break;
-      case MATH_SYMBOL.SQUARE: // 平方
-        this.result = FMath.square(this.result).toString();
+      case MATH_SYMBOL.SQUARE_ROOT:
+        this.result = FMath.squareRoot(this.result);
+        this.isFinished = true;
         break;
-      case MATH_SYMBOL.SQUARE_ROOT: //平方根
-        this.result = FMath.squareRoot(this.result).toString();
+      case MATH_SYMBOL.PLUS:
+        this.appendOperator(MATH_SYMBOL.PLUS);
         break;
-      case MATH_SYMBOL.PLUS: // 加法
-        this.expression = this.result + '+';
-        this.result = '0';
+      case MATH_SYMBOL.MINUS:
+        this.appendOperator(MATH_SYMBOL.MINUS);
         break;
-      case MATH_SYMBOL.MINUS: // 减法
-        this.expression = this.result + '-';
-        this.result = '0';
+      case MATH_SYMBOL.MULTIPLE:
+        this.appendOperator(MATH_SYMBOL.MULTIPLE);
         break;
-      case MATH_SYMBOL.MULTIPLE: // 乘法
-        this.expression = this.result + '×';
-        this.result = '0';
-        break;
-      case MATH_SYMBOL.DIVIDE: // 除法
-        this.expression = this.result + '÷';
-        this.result = '0';
+      case MATH_SYMBOL.DIVIDE:
+        this.appendOperator(MATH_SYMBOL.DIVIDE);
         break;
       case '0':
-        this.result += '0';
+        if (this.isFinished) {
+          this.result = '0';
+          this.isFinished = false;
+        } else if (this.result !== '0') {
+          this.result += '0';
+        }
         break;
       case MATH_SYMBOL.POINT:
-        if(!this.result.includes('.'))
-        this.result += '.';
+        if (this.isFinished) {
+          this.result = '0.';
+          this.isFinished = false;
+        } else if (!this.result.includes('.')) {
+          this.result += '.';
+        }
         break;
       case MATH_SYMBOL.EQUAL:
         this.calc();
         break;
       case MATH_SYMBOL.NEGATE:
-        this.result = FMath.negate(this.result).toString();
+        this.result = FMath.negate(this.result);
+        this.isFinished = true;
         break;
       default:
-        if(this.isFinished) {
+        if (this.isFinished || this.result === '0') {
           this.result = val;
-          this.isFinished = false;
         } else {
-          if(this.result !== '0') this.result += val;
-          else this.result = val;
+          this.result += val;
         }
+        this.isFinished = false;
         break;
     }
   }
